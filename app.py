@@ -47,6 +47,10 @@ BOOKS_SPEC = [
     ('igst', 'IGST', ['igst', 'integrated', 'iamt'], True),
     ('cgst', 'CGST', ['cgst', 'central', 'camt'], True),
     ('sgst', 'SGST / UTGST', ['sgst', 'utgst', 'state/ut', 'state', 'samt'], True),
+    ('gross', 'Gross Total / Invoice Value (optional - helps confirm GST not entered)', ['gross total', 'invoice value', 'bill amount', 'gross'], True),
+]
+G_SPEC = BOOKS_SPEC + [
+    ('itc', 'ITC Availability (2B)', ['itc availability', 'itcavl', 'itc avail'], True),
 ]
 CDNR_SPEC = [
     ('gstin', 'Supplier GSTIN', ['gstin', 'ctin'], False),
@@ -109,7 +113,8 @@ def parse_gstr2b_json(file):
             tx, ig, cg, sg = _doc_amounts(inv)
             b2b_rows.append({'GSTIN of Supplier': sup.get('ctin', ''), 'Party Name': sup.get('trdnm', '') or sup.get('cname', ''),
                              'Invoice Number': inv.get('inum', ''), 'Invoice Date': inv.get('dt', ''),
-                             'Invoice Value': _num(inv.get('val')), 'Taxable Value': tx, 'IGST': ig, 'CGST': cg, 'SGST': sg})
+                             'Invoice Value': _num(inv.get('val')), 'Taxable Value': tx, 'IGST': ig, 'CGST': cg, 'SGST': sg,
+                             'ITC Availability': {'Y': 'Yes', 'N': 'No'}.get(str(inv.get('itcavl', '')).upper(), '')})
     for sup in doc.get('cdnr', []) or []:
         for nt in sup.get('nt', []) or []:
             tx, ig, cg, sg = _doc_amounts(nt)
@@ -218,7 +223,7 @@ def main():
                 pr_map = mapping_block('pr', list(pr_raw.columns), BOOKS_SPEC, pr_file.name)
             with m2:
                 st.markdown('**GSTR-2B columns**')
-                g_map = mapping_block('g', list(gstr_raw.columns), BOOKS_SPEC, gstr_file.name)
+                g_map = mapping_block('g', list(gstr_raw.columns), G_SPEC, gstr_file.name)
             cd_map = None
             if cdnr_raw is not None:
                 with st.expander('Credit / Debit note columns'):
