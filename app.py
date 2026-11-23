@@ -1,5 +1,5 @@
 """
-Jarvis Ultra (Powerful Reconciliation Platform)
+Recon Ultra (Powerful Reconciliation Platform)
 -----------------------------------------------
 Purchase Register (Books) vs GSTR-2B - 100% local.
 Matching logic lives in recon_engine.py, this file is only the Streamlit UI.
